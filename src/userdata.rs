@@ -539,7 +539,7 @@ impl<'lua> AnyUserData<'lua> {
 
     /// Checks for a metamethod in this `AnyUserData`
     pub fn has_metamethod(&self, method: MetaMethod) -> Result<bool> {
-        match self.get_metatable() {
+        match self._get_metatable() {
             Ok(mt) => {
                 let name = self.0.lua.create_string(method.name())?;
                 if let Value::Nil = mt.raw_get(name)? {
@@ -553,7 +553,11 @@ impl<'lua> AnyUserData<'lua> {
         }
     }
 
-    fn get_metatable(&self) -> Result<Table<'lua>> {
+    /// Gets the metatable for this `AnyUserData`. This function is considered
+    /// unsafe, as altering the generated metatable can lead to unsaftey.
+    pub unsafe fn get_metatable(&self) -> Result<Table<'lua>> { self._get_metatable() }
+
+    fn _get_metatable(&self) -> Result<Table<'lua>> {
         unsafe {
             let lua = self.0.lua;
             let _sg = StackGuard::new(lua.state);
@@ -575,8 +579,8 @@ impl<'lua> AnyUserData<'lua> {
             return Ok(true);
         }
 
-        let mt = self.get_metatable()?;
-        if mt != other.get_metatable()? {
+        let mt = self._get_metatable()?;
+        if mt != other._get_metatable()? {
             return Ok(false);
         }
 
