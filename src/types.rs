@@ -23,16 +23,16 @@ pub type Number = ffi::lua_Number;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct LightUserData(pub *mut c_void);
 
-pub(crate) type Callback<'lua, 'a> =
+pub type Callback<'lua, 'a> =
     Box<dyn Fn(&'lua Lua, MultiValue<'lua>) -> Result<MultiValue<'lua>> + 'a>;
 
 #[cfg(feature = "async")]
-pub(crate) type AsyncCallback<'lua, 'a> =
+pub type AsyncCallback<'lua, 'a> =
     Box<dyn Fn(&'lua Lua, MultiValue<'lua>) -> LocalBoxFuture<'lua, Result<MultiValue<'lua>>> + 'a>;
 
-pub(crate) type HookCallback = Arc<RefCell<dyn FnMut(&Lua, Debug) -> Result<()>>>;
+pub type HookCallback = Arc<RefCell<dyn FnMut(&Lua, Debug) -> Result<()>>>;
 
-pub(crate) type UserDataCell<T> = RefCell<UserDataWrapped<T>>;
+pub type UserDataCell<T> = RefCell<UserDataWrapped<T>>;
 
 #[cfg(feature = "send")]
 pub trait MaybeSend: Send {}
@@ -60,8 +60,8 @@ impl<T> MaybeSend for T {}
 /// [`UserData::set_user_value`]: struct.UserData.html#method.set_user_value
 /// [`UserData::get_user_value`]: struct.UserData.html#method.get_user_value
 pub struct RegistryKey {
-    pub(crate) registry_id: c_int,
-    pub(crate) unref_list: Arc<Mutex<Option<Vec<c_int>>>>,
+    pub registry_id: c_int,
+    pub unref_list: Arc<Mutex<Option<Vec<c_int>>>>,
 }
 
 impl fmt::Debug for RegistryKey {
@@ -81,7 +81,7 @@ impl Drop for RegistryKey {
 
 impl RegistryKey {
     // Destroys the RegistryKey without adding to the drop list
-    pub(crate) fn take(self) -> c_int {
+    pub fn take(self) -> c_int {
         let registry_id = self.registry_id;
         unsafe {
             ptr::read(&self.unref_list);
@@ -91,9 +91,9 @@ impl RegistryKey {
     }
 }
 
-pub(crate) struct LuaRef<'lua> {
-    pub(crate) lua: &'lua Lua,
-    pub(crate) index: c_int,
+pub struct LuaRef<'lua> {
+    pub lua: &'lua Lua,
+    pub index: c_int,
 }
 
 impl<'lua> fmt::Debug for LuaRef<'lua> {

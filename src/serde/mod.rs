@@ -175,7 +175,7 @@ impl<'lua> LuaSerdeExt<'lua> for Lua {
     }
 }
 
-pub(crate) unsafe fn init_metatables(state: *mut ffi::lua_State) {
+pub unsafe fn init_metatables(state: *mut ffi::lua_State) {
     ffi::lua_pushlightuserdata(
         state,
         &ARRAY_METATABLE_REGISTRY_KEY as *const u8 as *mut c_void,
@@ -189,7 +189,7 @@ pub(crate) unsafe fn init_metatables(state: *mut ffi::lua_State) {
     ffi::lua_rawset(state, ffi::LUA_REGISTRYINDEX);
 }
 
-pub(crate) unsafe fn push_array_metatable(state: *mut ffi::lua_State) {
+pub unsafe fn push_array_metatable(state: *mut ffi::lua_State) {
     let key = &ARRAY_METATABLE_REGISTRY_KEY as *const u8 as *mut c_void;
     ffi::lua_rawgetp(state, ffi::LUA_REGISTRYINDEX, key);
 }

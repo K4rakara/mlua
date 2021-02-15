@@ -42,7 +42,7 @@ pub struct Scope<'lua, 'scope> {
 }
 
 impl<'lua, 'scope> Scope<'lua, 'scope> {
-    pub(crate) fn new(lua: &'lua Lua) -> Scope<'lua, 'scope> {
+    pub fn new(lua: &'lua Lua) -> Scope<'lua, 'scope> {
         Scope {
             lua,
             destructors: RefCell::new(Vec::new()),

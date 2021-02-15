@@ -141,7 +141,7 @@ pub struct HookTriggers {
 
 impl HookTriggers {
     // Compute the mask to pass to `lua_sethook`.
-    pub(crate) fn mask(&self) -> c_int {
+    pub fn mask(&self) -> c_int {
         let mut mask: c_int = 0;
         if self.on_calls {
             mask |= ffi::LUA_MASKCALL
@@ -160,12 +160,12 @@ impl HookTriggers {
 
     // Returns the `count` parameter to pass to `lua_sethook`, if applicable. Otherwise, zero is
     // returned.
-    pub(crate) fn count(&self) -> c_int {
+    pub fn count(&self) -> c_int {
         self.every_nth_instruction.unwrap_or(0) as c_int
     }
 }
 
-pub(crate) unsafe extern "C" fn hook_proc(state: *mut lua_State, ar: *mut lua_Debug) {
+pub unsafe extern "C" fn hook_proc(state: *mut lua_State, ar: *mut lua_Debug) {
     callback_error(state, |_| {
         let debug = Debug {
             ar,

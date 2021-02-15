@@ -108,7 +108,7 @@ pub enum MetaMethod {
 }
 
 impl MetaMethod {
-    pub(crate) fn name(self) -> &'static [u8] {
+    pub fn name(self) -> &'static [u8] {
         match self {
             MetaMethod::Add => b"__add",
             MetaMethod::Sub => b"__sub",
@@ -368,8 +368,8 @@ pub trait UserData: Sized {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(_methods: &mut M) {}
 }
 
-pub(crate) struct UserDataWrapped<T> {
-    pub(crate) data: *mut T,
+pub struct UserDataWrapped<T> {
+    pub data: *mut T,
     #[cfg(feature = "serialize")]
     ser: *mut dyn erased_serde::Serialize,
 }
@@ -387,7 +387,7 @@ impl<T> Drop for UserDataWrapped<T> {
 }
 
 impl<T> UserDataWrapped<T> {
-    pub(crate) fn new(data: T) -> Self {
+    pub fn new(data: T) -> Self {
         UserDataWrapped {
             data: Box::into_raw(Box::new(data)),
             #[cfg(feature = "serialize")]
@@ -396,7 +396,7 @@ impl<T> UserDataWrapped<T> {
     }
 
     #[cfg(feature = "serialize")]
-    pub(crate) fn new_ser(data: T) -> Self
+    pub fn new_ser(data: T) -> Self
     where
         T: 'static + Serialize,
     {
@@ -421,7 +421,7 @@ impl<T> AsMut<T> for UserDataWrapped<T> {
 }
 
 #[cfg(feature = "serialize")]
-pub(crate) struct UserDataSerializeError;
+pub struct UserDataSerializeError;
 
 #[cfg(feature = "serialize")]
 impl Serialize for UserDataSerializeError {
@@ -450,7 +450,7 @@ impl Serialize for UserDataSerializeError {
 /// [`is`]: #method.is
 /// [`borrow`]: #method.borrow
 #[derive(Clone, Debug)]
-pub struct AnyUserData<'lua>(pub(crate) LuaRef<'lua>);
+pub struct AnyUserData<'lua>(pub LuaRef<'lua>);
 
 impl<'lua> AnyUserData<'lua> {
     /// Checks whether the type of this userdata is `T`.
@@ -573,7 +573,7 @@ impl<'lua> AnyUserData<'lua> {
         }
     }
 
-    pub(crate) fn equals<T: AsRef<Self>>(&self, other: T) -> Result<bool> {
+    pub fn equals<T: AsRef<Self>>(&self, other: T) -> Result<bool> {
         let other = other.as_ref();
         if self == other {
             return Ok(true);

@@ -204,15 +204,15 @@ impl<'lua> MultiValue<'lua> {
         v
     }
 
-    pub(crate) fn reserve(&mut self, size: usize) {
+    pub fn reserve(&mut self, size: usize) {
         self.0.reserve(size);
     }
 
-    pub(crate) fn push_front(&mut self, value: Value<'lua>) {
+    pub fn push_front(&mut self, value: Value<'lua>) {
         self.0.push(value);
     }
 
-    pub(crate) fn pop_front(&mut self) -> Option<Value<'lua>> {
+    pub fn pop_front(&mut self) -> Option<Value<'lua>> {
         self.0.pop()
     }
 

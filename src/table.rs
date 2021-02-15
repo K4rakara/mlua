@@ -19,7 +19,7 @@ use {futures_core::future::LocalBoxFuture, futures_util::future};
 
 /// Handle to an internal Lua table.
 #[derive(Clone, Debug)]
-pub struct Table<'lua>(pub(crate) LuaRef<'lua>);
+pub struct Table<'lua>(pub LuaRef<'lua>);
 
 #[allow(clippy::len_without_is_empty)]
 impl<'lua> Table<'lua> {
@@ -475,7 +475,7 @@ impl<'lua> Table<'lua> {
     }
 
     #[cfg(feature = "serialize")]
-    pub(crate) fn raw_sequence_values_by_len<V: FromLua<'lua>>(self) -> TableSequence<'lua, V> {
+    pub fn raw_sequence_values_by_len<V: FromLua<'lua>>(self) -> TableSequence<'lua, V> {
         let len = self.raw_len();
         TableSequence {
             table: self.0,
@@ -487,7 +487,7 @@ impl<'lua> Table<'lua> {
     }
 
     #[cfg(feature = "serialize")]
-    pub(crate) fn is_array(&self) -> bool {
+    pub fn is_array(&self) -> bool {
         let lua = self.0.lua;
         unsafe {
             let _sg = StackGuard::new(lua.state);

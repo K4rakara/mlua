@@ -15,7 +15,7 @@ use crate::util::{assert_stack, StackGuard};
 ///
 /// Unlike Rust strings, Lua strings may not be valid UTF-8.
 #[derive(Clone, Debug)]
-pub struct String<'lua>(pub(crate) LuaRef<'lua>);
+pub struct String<'lua>(pub LuaRef<'lua>);
 
 impl<'lua> String<'lua> {
     /// Get a `&str` slice if the Lua string is valid UTF-8.

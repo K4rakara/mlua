@@ -43,7 +43,7 @@ pub enum ThreadStatus {
 
 /// Handle to an internal Lua thread (or coroutine).
 #[derive(Clone, Debug)]
-pub struct Thread<'lua>(pub(crate) LuaRef<'lua>);
+pub struct Thread<'lua>(pub LuaRef<'lua>);
 
 /// Thread (coroutine) representation as an async [`Future`] or [`Stream`].
 ///

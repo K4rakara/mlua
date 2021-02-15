@@ -45,7 +45,7 @@ use {crate::util::get_destructed_userdata_metatable, serde::Serialize};
 
 /// Top level Lua struct which holds the Lua state itself.
 pub struct Lua {
-    pub(crate) state: *mut ffi::lua_State,
+    pub state: *mut ffi::lua_State,
     main_state: Option<*mut ffi::lua_State>,
     extra: Arc<Mutex<ExtraData>>,
     ephemeral: bool,
@@ -93,10 +93,10 @@ pub enum GCMode {
 }
 
 #[cfg(feature = "async")]
-pub(crate) struct AsyncPollPending;
+pub struct AsyncPollPending;
 #[cfg(feature = "async")]
-pub(crate) static WAKER_REGISTRY_KEY: u8 = 0;
-pub(crate) static EXTRA_REGISTRY_KEY: u8 = 0;
+pub static WAKER_REGISTRY_KEY: u8 = 0;
+pub static EXTRA_REGISTRY_KEY: u8 = 0;
 
 /// Requires `feature = "send"`
 #[cfg(feature = "send")]
@@ -1352,7 +1352,7 @@ impl Lua {
     }
 
     // Uses 2 stack spaces, does not call checkstack
-    pub(crate) unsafe fn push_value(&self, value: Value) -> Result<()> {
+    pub unsafe fn push_value(&self, value: Value) -> Result<()> {
         match value {
             Value::Nil => {
                 ffi::lua_pushnil(self.state);
@@ -1403,7 +1403,7 @@ impl Lua {
     }
 
     // Uses 2 stack spaces, does not call checkstack
-    pub(crate) unsafe fn pop_value(&self) -> Value {
+    pub unsafe fn pop_value(&self) -> Value {
         match ffi::lua_type(self.state, -1) {
             ffi::LUA_TNIL => {
                 ffi::lua_pop(self.state, 1);
@@ -1459,7 +1459,7 @@ impl Lua {
     }
 
     // Pushes a LuaRef value onto the stack, uses 1 stack space, does not call checkstack
-    pub(crate) unsafe fn push_ref<'lua>(&'lua self, lref: &LuaRef<'lua>) {
+    pub unsafe fn push_ref<'lua>(&'lua self, lref: &LuaRef<'lua>) {
         assert!(
             Arc::ptr_eq(&lref.lua.extra, &self.extra),
             "Lua instance passed Value created from a different main Lua state"
@@ -1478,14 +1478,14 @@ impl Lua {
     // used stack.  The implementation is somewhat biased towards the use case of a relatively small
     // number of short term references being created, and `RegistryKey` being used for long term
     // references.
-    pub(crate) unsafe fn pop_ref(&self) -> LuaRef {
+    pub unsafe fn pop_ref(&self) -> LuaRef {
         let mut extra = mlua_expect!(self.extra.lock(), "extra is poisoned");
         ffi::lua_xmove(self.state, extra.ref_thread, 1);
         let index = ref_stack_pop(&mut extra);
         LuaRef { lua: self, index }
     }
 
-    pub(crate) fn clone_ref<'lua>(&'lua self, lref: &LuaRef<'lua>) -> LuaRef<'lua> {
+    pub fn clone_ref<'lua>(&'lua self, lref: &LuaRef<'lua>) -> LuaRef<'lua> {
         unsafe {
             let mut extra = mlua_expect!(self.extra.lock(), "extra is poisoned");
             ffi::lua_pushvalue(extra.ref_thread, lref.index);
@@ -1494,7 +1494,7 @@ impl Lua {
         }
     }
 
-    pub(crate) fn drop_ref<'lua>(&'lua self, lref: &mut LuaRef<'lua>) {
+    pub fn drop_ref<'lua>(&'lua self, lref: &mut LuaRef<'lua>) {
         unsafe {
             let mut extra = mlua_expect!(self.extra.lock(), "extra is poisoned");
             ffi::lua_pushnil(extra.ref_thread);
@@ -1503,7 +1503,7 @@ impl Lua {
         }
     }
 
-    pub(crate) unsafe fn userdata_metatable<T: 'static + UserData>(&self) -> Result<c_int> {
+    pub unsafe fn userdata_metatable<T: 'static + UserData>(&self) -> Result<c_int> {
         if let Some(table_id) = mlua_expect!(self.extra.lock(), "extra is poisoned")
             .registered_userdata
             .get(&TypeId::of::<T>())
@@ -1576,7 +1576,7 @@ impl Lua {
     // Pushes a LuaRef value onto the stack, checking that it's any registered userdata
     // Uses 2 stack spaces, does not call checkstack
     #[cfg(feature = "serialize")]
-    pub(crate) unsafe fn push_userdata_ref(&self, lref: &LuaRef) -> Result<()> {
+    pub unsafe fn push_userdata_ref(&self, lref: &LuaRef) -> Result<()> {
         self.push_ref(lref);
         if ffi::lua_getmetatable(self.state, -1) == 0 {
             Err(Error::UserDataTypeMismatch)
@@ -1607,7 +1607,7 @@ impl Lua {
     //
     // So we instead use a caller provided lifetime, which without the 'static requirement would be
     // unsafe.
-    pub(crate) fn create_callback<'lua, 'callback>(
+    pub fn create_callback<'lua, 'callback>(
         &'lua self,
         func: Callback<'callback, 'static>,
     ) -> Result<Function<'lua>>
@@ -1664,7 +1664,7 @@ impl Lua {
     }
 
     #[cfg(feature = "async")]
-    pub(crate) fn create_async_callback<'lua, 'callback>(
+    pub fn create_async_callback<'lua, 'callback>(
         &'lua self,
         func: AsyncCallback<'callback, 'static>,
     ) -> Result<Function<'lua>>
@@ -1804,7 +1804,7 @@ impl Lua {
         .into_function()
     }
 
-    pub(crate) unsafe fn make_userdata<T>(&self, data: UserDataWrapped<T>) -> Result<AnyUserData>
+    pub unsafe fn make_userdata<T>(&self, data: UserDataWrapped<T>) -> Result<AnyUserData>
     where
         T: 'static + UserData,
     {
@@ -1824,7 +1824,7 @@ impl Lua {
         Ok(AnyUserData(self.pop_ref()))
     }
 
-    pub(crate) fn clone(&self) -> Self {
+    pub fn clone(&self) -> Self {
         Lua {
             state: self.state,
             main_state: self.main_state,
@@ -1861,7 +1861,7 @@ impl Lua {
         Ok(())
     }
 
-    pub(crate) unsafe fn make_from_ptr(state: *mut ffi::lua_State) -> Self {
+    pub unsafe fn make_from_ptr(state: *mut ffi::lua_State) -> Self {
         let _sg = StackGuard::new(state);
         assert_stack(state, 3);
 
@@ -1886,7 +1886,7 @@ impl Lua {
         }
     }
 
-    pub(crate) unsafe fn hook_callback(&self) -> Option<HookCallback> {
+    pub unsafe fn hook_callback(&self) -> Option<HookCallback> {
         let extra = mlua_expect!(self.extra.lock(), "extra is poisoned");
         extra.hook_callback.clone()
     }

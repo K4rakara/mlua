@@ -14,7 +14,7 @@ use {futures_core::future::LocalBoxFuture, futures_util::future};
 
 /// Handle to an internal Lua function.
 #[derive(Clone, Debug)]
-pub struct Function<'lua>(pub(crate) LuaRef<'lua>);
+pub struct Function<'lua>(pub LuaRef<'lua>);
 
 impl<'lua> Function<'lua> {
     /// Calls the function, passing `args` as function arguments.
