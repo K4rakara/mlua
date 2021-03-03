@@ -1,12 +1,12 @@
 [package]
 name = "mlua"
-version = "0.5.1" # remember to update html_root_url and mlua_derive
+version = "0.5.2" # remember to update html_root_url and mlua_derive
 authors = ["Aleksandr Orlenko <zxteam@pm.me>", "kyren <catherine@chucklefish.org>"]
 edition = "2018"
 repository = "https://github.com/khvzak/mlua"
 documentation = "https://docs.rs/mlua"
 readme = "README.md"
-keywords = ["lua", "luajit", "async", "futures"]
+keywords = ["lua", "luajit", "async", "futures", "scripting"]
 categories = ["api-bindings", "asynchronous"]
 license = "MIT"
 links = "lua"
@@ -58,7 +58,7 @@ luajit-src = { version = ">= 210.1.2, < 220.0.0", optional = true }
 
 [dev-dependencies]
 rustyline = "7.0"
-criterion = "0.3"
+criterion = { version = "0.3.4", features = ["html_reports", "async_tokio"] }
 trybuild = "1.0"
 futures = "0.3.5"
 hyper = { version = "0.14", features = ["client", "server"] }
@@ -70,6 +70,7 @@ serde_json = "1.0"
 [[bench]]
 name = "benchmark"
 harness = false
+required-features = ["async"]
 
 [[example]]
 name = "async_http_client"
